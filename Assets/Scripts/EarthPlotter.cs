@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Text.RegularExpressions;
+using System.Globalization;
 
 public class EarthPlotter : MonoBehaviour
 {
@@ -8,7 +10,7 @@ public class EarthPlotter : MonoBehaviour
     GameObject _cityPlotPrefab = null;
 
     [SerializeField]
-    float _radius;
+    float _radius = 0.5f;
 
     List<Dictionary<string, object>> data;
 
@@ -30,19 +32,62 @@ public class EarthPlotter : MonoBehaviour
 
     void Start()
     {
+        float latitude;
+        float longitude;
 
-        for (var i = 0; i < 10; i++)//for (var i = 0; i < data.Count; i++)
+        string currentCity = null;
+        
+        for (var i = 0; i < data.Count; i++)
         {
-            string currentText = data[i]["Latitude"].ToString();
-            string latitudeNorS = currentText.Substring(currentText.Length - 1);
-            currentText = data[i]["Longitude"].ToString();
-            string longitudeLorW = currentText.Substring(currentText.Length - 1);
+            if (currentCity != data[i]["City"].ToString())
+            {
 
-            float longitude;
+                currentCity = data[i]["City"].ToString();
 
-            Debug.Log("STRINGS: " + latitudeNorS + longitudeLorW);
+                float temp;
 
-            //GameObject CurrentPlot = Instantiate(_cityPlotPrefab, Quaternion.Euler(_radius, 0, 0), (), this);
+                string currentText = data[i]["Latitude"].ToString();
+                if (currentText.Contains('N'))
+                {
+                    currentText = currentText.Remove(currentText.Length - 1);
+                    float.TryParse(currentText, NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out temp);
+                    latitude = temp;
+                }
+                else
+                {
+                    currentText = currentText.Remove(currentText.Length - 1);
+                    float.TryParse(currentText, NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out temp);
+                    latitude = -temp;
+                }
+
+                currentText = data[i]["Longitude"].ToString();
+                if (currentText.Contains('E'))
+                {
+                    currentText = currentText.Remove(currentText.Length - 1);
+                    float.TryParse(currentText, NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out temp);
+                    longitude = temp;
+                }
+                else
+                {
+                    currentText = currentText.Remove(currentText.Length - 1);
+                    float.TryParse(currentText, NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out temp);
+                    longitude = -temp;
+                }
+
+                latitude *= Mathf.Deg2Rad;
+                longitude *= Mathf.Deg2Rad;
+
+                float x = _radius * Mathf.Cos(latitude) * Mathf.Cos(longitude);
+                float y = _radius * Mathf.Sin(latitude);
+                float z = _radius * Mathf.Cos(latitude) * Mathf.Sin(longitude);
+
+                GameObject CurrentInstance = Instantiate(_cityPlotPrefab, this.transform.position + new Vector3 (x,y,z), Quaternion.identity);
+                Controller_CityPlot CurrentCityPlot = CurrentInstance.GetComponent<Controller_CityPlot>();
+                CurrentInstance.transform.forward = (this.transform.position - CurrentInstance.transform.position);
+                CurrentInstance.transform.SetParent(this.transform);
+                CurrentCityPlot.CityName.text = data[i]["City"].ToString();
+                CurrentCityPlot.CityTemperature.text = data[i]["AverageTemperature"].ToString();
+            }
         }
     }
 }
