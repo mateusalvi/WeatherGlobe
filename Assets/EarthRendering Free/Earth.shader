@@ -1,3 +1,5 @@
+// Upgrade NOTE: replaced 'UNITY_INSTANCE_ID' with 'UNITY_VERTEX_INPUT_INSTANCE_ID'
+
 // Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
 
 Shader "Earth"
@@ -26,7 +28,8 @@ Shader "Earth"
 			#include "UnityCG.cginc"
 			#pragma vertex vert 
 			#pragma fragment frag
-			
+
+
 			sampler2D _DiffuseTex;
 			sampler2D _CloudAndNightTex;
 
@@ -41,6 +44,7 @@ Shader "Earth"
 				float4 pos				: POSITION;
 				float3 normal			: NORMAL;
 				float2 uv				: TEXCOORD0;
+				UNITY_VERTEX_INPUT_INSTANCE_ID
 			};
 
 			struct vertexOutput 
@@ -50,11 +54,14 @@ Shader "Earth"
 				half diffuse		: TEXCOORD1;
 				half night			: TEXCOORD2;
 				half3 atmosphere	: TEXCOORD3;
+				UNITY_VERTEX_OUTPUT_STEREO
 			};
 			
 			vertexOutput vert(vertexInput input) 
 			{
+				UNITY_SETUP_INSTANCE_ID(input);
 				vertexOutput output;
+				UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
 				output.pos = UnityObjectToClipPos(input.pos);
 				output.uv = input.uv;
 

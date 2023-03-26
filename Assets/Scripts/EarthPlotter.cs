@@ -86,7 +86,8 @@ public class EarthPlotter : MonoBehaviour
                 CurrentInstance.transform.forward = (this.transform.position - CurrentInstance.transform.position);
                 CurrentInstance.transform.SetParent(this.transform);
                 CurrentCityPlot.CityName.text = data[i]["City"].ToString();
-                CurrentCityPlot.CityTemperature.text = data[i]["AverageTemperature"].ToString();
+                CurrentCityPlot.UpdatePlot(data[i]["AverageTemperature"].ToString());
+                //CurrentCityPlot.Temperature = data[i]["AverageTemperature"].ToString();
             }
         }
     }

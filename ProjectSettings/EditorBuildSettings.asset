@@ -35,10 +35,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Interactive Scatterplot with Oculus Interactions SDK.unity
     guid: 4e9062cf053b74669bbce55fb3a318a2
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/World View.unity
     guid: 57ef5f23cccae49bb8608a833736e364
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Interactible Map with Bing.unity
     guid: 3bced8a23c8d442a58559d37655a1e1b
   - enabled: 0
