@@ -5,6 +5,8 @@ using TMPro;
 using System.Text.RegularExpressions;
 using System.Globalization;
 using Unity.VisualScripting;
+using System.Linq;
+using System;
 
 public class Controller_CityPlot : MonoBehaviour
 {
@@ -38,6 +40,8 @@ public class Controller_CityPlot : MonoBehaviour
 
     [SerializeField]
     float _scaleInAnimationTime = 0.2f;
+
+    List<(string date, string temperature)> _dateTemperature = new();
 
     Vector3 _temperatureNaturalScale = Vector3.one;
 
@@ -76,6 +80,32 @@ public class Controller_CityPlot : MonoBehaviour
         _cityNameTextTransform.localScale = Vector3.zero;      
         CityTemperature.transform.localScale = _outOfFocusScale;
         
+    }
+
+    public void AddToDateTempList(string date, string temperature)
+    {
+        _dateTemperature.Add((date, temperature));
+    }
+
+    public void ChangeDisplayDate(string date)
+    {
+        bool dateExists = false;
+        
+        _dateTemperature.ForEach(element => { if (element.date == date) 
+                                              { 
+                                                UpdatePlot(element.temperature);
+                                                _plotRenderer.enabled = true;
+                                                CityName.enabled = true;
+                                                CityTemperature.enabled = true;
+                                                dateExists = true;
+                                              } 
+                                            }   );
+        if (!dateExists)
+        {
+            _plotRenderer.enabled = false;
+            CityName.enabled = false;
+            CityTemperature.enabled = false;
+        }
     }
 
     public void UpdatePlot(string cityTemp)

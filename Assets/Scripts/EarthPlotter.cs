@@ -10,15 +10,20 @@ public class EarthPlotter : MonoBehaviour
     GameObject _cityPlotPrefab = null;
 
     [SerializeField]
+    string _firstDate = "1993-08-01";
+
+    [SerializeField]
     float _radius = 0.5f;
 
     List<Dictionary<string, object>> data;
+
+    List<Controller_CityPlot> _CityPlots = new();
 
     private void Awake()
     {
         data = DatasetReader.Read("GlobalLandTemperaturesByMajorCity");
 
-        //for (var i = 0; i < 10; i++)
+        //for (var i = 0; i < 100; i++)
         //{
         //    print("Date " + data[i]["dt"] + " " +
         //           "AverageTemperature " + data[i]["AverageTemperature"] + " " +
@@ -36,7 +41,9 @@ public class EarthPlotter : MonoBehaviour
         float longitude;
 
         string currentCity = null;
-        
+        Controller_CityPlot CurrentCityPlot = null;
+
+
         for (var i = 0; i < data.Count; i++)
         {
             if (currentCity != data[i]["City"].ToString())
@@ -82,13 +89,33 @@ public class EarthPlotter : MonoBehaviour
                 float z = _radius * Mathf.Cos(latitude) * Mathf.Sin(longitude);
 
                 GameObject CurrentInstance = Instantiate(_cityPlotPrefab, this.transform.position + new Vector3 (x,y,z), Quaternion.identity);
-                Controller_CityPlot CurrentCityPlot = CurrentInstance.GetComponent<Controller_CityPlot>();
+                CurrentCityPlot = CurrentInstance.GetComponent<Controller_CityPlot>();
                 CurrentInstance.transform.forward = (this.transform.position - CurrentInstance.transform.position);
                 CurrentInstance.transform.SetParent(this.transform);
                 CurrentCityPlot.CityName.text = data[i]["City"].ToString();
-                CurrentCityPlot.UpdatePlot(data[i]["AverageTemperature"].ToString());
+                //CurrentCityPlot.UpdatePlot(data[i]["AverageTemperature"].ToString());
+                CurrentCityPlot.AddToDateTempList(data[i]["dt"].ToString(), data[i]["AverageTemperature"].ToString());
+                _CityPlots.Add(CurrentCityPlot);
                 //CurrentCityPlot.Temperature = data[i]["AverageTemperature"].ToString();
             }
+            else
+            {
+                if ((data[i]["AverageTemperature"] != null) && (data[i]["AverageTemperature"].ToString() != ""))
+                {
+                    CurrentCityPlot.AddToDateTempList(data[i]["dt"].ToString(), data[i]["AverageTemperature"].ToString());
+
+                }
+            }
+        }
+
+        ChangeCitiesDates(_firstDate);
+    }
+
+    public void ChangeCitiesDates(string newDate)
+    {
+        foreach (Controller_CityPlot city in _CityPlots)
+        {
+            city.ChangeDisplayDate(newDate);
         }
     }
 }
