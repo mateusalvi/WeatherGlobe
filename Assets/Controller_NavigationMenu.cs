@@ -12,9 +12,9 @@ public class Controller_NavigationMenu : MonoBehaviour
     [SerializeField]
     TextMeshPro _monthText;
 
-    int _selectedMonth = 08;
+    int _selectedMonth = 01;
 
-    int _selectedYear = 1993;
+    int _selectedYear = 2000;
 
     private void Start()
     {

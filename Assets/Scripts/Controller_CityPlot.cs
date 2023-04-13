@@ -7,13 +7,11 @@ using System.Globalization;
 using Unity.VisualScripting;
 using System.Linq;
 using System;
+using UnityEngine.Experimental.GlobalIllumination;
 
 public class Controller_CityPlot : MonoBehaviour
 {
-    public float TemperatureFloat = 0;
-
-    int TemperatureInt = 0;
-    
+    [Header("References")]
     [SerializeField]
     public TextMeshPro CityName = null;
     
@@ -24,22 +22,28 @@ public class Controller_CityPlot : MonoBehaviour
     Material PlotMaterial = null;
     
     [SerializeField]
-    Texture2D _colorRampTexture = null;
-    
-    [SerializeField]
     Renderer _plotRenderer = null;
 
+    [Header("Visuals")]
     [SerializeField]
-    Vector3 _outOfFocusScale = Vector3.one;
+    Texture2D _colorRampTexture = null;
 
     [SerializeField]
     private float _transparency;
+
+    [SerializeField]
+    Vector3 _outOfFocusScale = Vector3.one;
 
     [SerializeField]
     Vector3 _temperaturePointedOfset = new (0.0f, -0.2f, 0.0f);
 
     [SerializeField]
     float _scaleInAnimationTime = 0.2f;
+
+    [HideInInspector]
+    public float TemperatureFloat = 0;
+
+    int TemperatureInt = 0;
 
     List<(string date, string temperature)> _dateTemperature = new();
 
@@ -63,11 +67,6 @@ public class Controller_CityPlot : MonoBehaviour
 
     private void Start()
     {
-        //float.TryParse(CityTemperature.text, out TemperatureFloat);
-        //TemperatureInt = (int)TemperatureFloat;
-        //Debug.Log(TemperatureInt);
-        //_currentColor = _colorRampTexture.GetPixel(TemperatureInt + 64, 0);
-        //_plotRenderer.material.color = _currentColor;
         _cityNameTextTransform = CityName.transform;
         _temperatureTextTransform = CityTemperature.transform;
 
@@ -77,9 +76,15 @@ public class Controller_CityPlot : MonoBehaviour
         _temperatureTextNaturalPosition = CityTemperature.transform.localPosition;
         _temperatureTextOfsetPosition = _temperatureTextNaturalPosition + _temperaturePointedOfset;
 
-        _cityNameTextTransform.localScale = Vector3.zero;      
+        _cityNameTextTransform.localScale = Vector3.zero;
         CityTemperature.transform.localScale = _outOfFocusScale;
-        
+    }
+
+    private void Update()
+    {
+        //God forgive me for what im about to do
+        transform.LookAt(this.transform.parent.transform);
+        transform.forward = -transform.forward;
     }
 
     public void AddToDateTempList(string date, string temperature)
@@ -91,15 +96,15 @@ public class Controller_CityPlot : MonoBehaviour
     {
         bool dateExists = false;
         
-        _dateTemperature.ForEach(element => { if (element.date == date) 
-                                              { 
+        _dateTemperature.ForEach(element => { if (element.date == date)
+                                              {
                                                 UpdatePlot(element.temperature);
                                                 _plotRenderer.enabled = true;
                                                 CityName.enabled = true;
                                                 CityTemperature.enabled = true;
                                                 dateExists = true;
-                                              } 
-                                            }   );
+                                              }
+                                            });
         if (!dateExists)
         {
             _plotRenderer.enabled = false;
@@ -123,21 +128,22 @@ public class Controller_CityPlot : MonoBehaviour
     public void EnableText()
     {
         StopAllCoroutines();
+
         StartCoroutine(SmoothScale(_cityNameTextTransform, _nameNaturalScale));
 
         StartCoroutine(SmoothScale(_temperatureTextTransform, _temperatureNaturalScale));
-        //_textTransform.localScale = _naturalScale;
+
         StartCoroutine(SmoothTransform(_temperatureTextTransform, _temperatureTextOfsetPosition));
-    
     }
 
     public void DisableText()
     {
         StopAllCoroutines();
+
         StartCoroutine(SmoothScale(_cityNameTextTransform, Vector3.zero));
 
         StartCoroutine(SmoothScale(_temperatureTextTransform, _outOfFocusScale));
-        //_textTransform.localScale = _outOfFocusScale;
+
         StartCoroutine(SmoothTransform(_temperatureTextTransform, _temperatureTextNaturalPosition));
     }
 

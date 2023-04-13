@@ -22,17 +22,6 @@ public class EarthPlotter : MonoBehaviour
     private void Awake()
     {
         data = DatasetReader.Read("GlobalLandTemperaturesByMajorCity");
-
-        //for (var i = 0; i < 100; i++)
-        //{
-        //    print("Date " + data[i]["dt"] + " " +
-        //           "AverageTemperature " + data[i]["AverageTemperature"] + " " +
-        //           "AverageTemperatureUncertainty " + data[i]["AverageTemperatureUncertainty"] + " " +
-        //           "City " + data[i]["City"] + " " +
-        //           "Country " + data[i]["Country"] + " " +
-        //           "Latitude " + data[i]["Latitude"] + " " +
-        //           "Longitude " + data[i]["Longitude"]);
-        //}
     }
 
     void Start()
@@ -41,8 +30,8 @@ public class EarthPlotter : MonoBehaviour
         float longitude;
 
         string currentCity = null;
-        Controller_CityPlot CurrentCityPlot = null;
 
+        Controller_CityPlot CurrentCityPlot = null;
 
         for (var i = 0; i < data.Count; i++)
         {
@@ -90,7 +79,7 @@ public class EarthPlotter : MonoBehaviour
 
                 GameObject CurrentInstance = Instantiate(_cityPlotPrefab, this.transform.position + new Vector3 (x,y,z), Quaternion.identity);
                 CurrentCityPlot = CurrentInstance.GetComponent<Controller_CityPlot>();
-                CurrentInstance.transform.forward = (this.transform.position - CurrentInstance.transform.position);
+                CurrentInstance.transform.forward = (CurrentInstance.transform.position - this.transform.position);
                 CurrentInstance.transform.SetParent(this.transform);
                 CurrentCityPlot.CityName.text = data[i]["City"].ToString();
                 //CurrentCityPlot.UpdatePlot(data[i]["AverageTemperature"].ToString());
@@ -103,7 +92,6 @@ public class EarthPlotter : MonoBehaviour
                 if ((data[i]["AverageTemperature"] != null) && (data[i]["AverageTemperature"].ToString() != ""))
                 {
                     CurrentCityPlot.AddToDateTempList(data[i]["dt"].ToString(), data[i]["AverageTemperature"].ToString());
-
                 }
             }
         }
